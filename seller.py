@@ -12,7 +12,17 @@ logger = logging.getLogger(__file__)
 
 
 def get_product_list(last_id, client_id, seller_token):
-    """Получить список товаров магазина озон"""
+    """Получить список товаров от маркетплейса seller.ozon.ru
+
+    Args:
+        last_id (str): уникальный идетнификатор товара
+        client_id (int): идентификатор компании и магазина
+        seller_token (str): api token от маркетплейса
+
+    Returns:
+        list: Список из 1000 товаров
+
+    """
     url = "https://api-seller.ozon.ru/v2/product/list"
     headers = {
         "Client-Id": client_id,
@@ -32,7 +42,19 @@ def get_product_list(last_id, client_id, seller_token):
 
 
 def get_offer_ids(client_id, seller_token):
-    """Получить артикулы товаров магазина озон"""
+    """Получить артикулы товаров магазина озон
+
+    Создается список из артикулей товаров, полученных с маркетплейса по частям (1000 товаров на 1 запрос).
+    Далее создается список уникальных идентификаторов.
+
+    Args:
+        client_id (int): идентификатор компании и магазина
+        seller_token (str): api token от маркетплейса
+
+    Returns:
+        list: Список уникальных идентификаторов товара
+
+    """
     last_id = ""
     product_list = []
     while True:
@@ -49,7 +71,40 @@ def get_offer_ids(client_id, seller_token):
 
 
 def update_price(prices: list, client_id, seller_token):
-    """Обновить цены товаров"""
+    """Обновить цены товаров
+
+    Example:
+        "prices": [
+            {
+                "auto_action_enabled": "UNKNOWN",
+                "currency_code": "RUB",
+                "min_price": "800",
+                "offer_id": "",
+                "old_price": "0",
+                "price": "1448",
+                "price_strategy_enabled": "UNKNOWN",
+                "product_id": 1386
+            }
+        ]
+
+    Args:
+        prices: список, содержащий информацияю о ценах товаров
+        client_id (int): идентификатор компании и магазина
+        seller_token (str): api token от маркетплейса
+
+    Returns:
+        dict: результат запроса, например:
+            {
+                "result": [
+                    {
+                        "product_id": 1386,
+                        "offer_id": "PH8865",
+                        "updated": true,
+                        "errors": [ ]
+                    }
+                ]
+            }
+    """
     url = "https://api-seller.ozon.ru/v1/product/import/prices"
     headers = {
         "Client-Id": client_id,
@@ -62,7 +117,38 @@ def update_price(prices: list, client_id, seller_token):
 
 
 def update_stocks(stocks: list, client_id, seller_token):
-    """Обновить остатки"""
+    """Обновить остатки
+
+    Позволяет изменить информацию о количестве товара в наличии.
+
+    Example:
+        stocks: [
+            {
+                "offer_id": "PG-2404С1",
+                "product_id": 55946,
+                "stock": 4
+            }
+        ]
+
+    Args:
+        stocks: список содержащий информацию количестве товаров на складе
+        client_id (int): идентификатор компании и магазина
+        seller_token (str): api token от маркетплейса
+
+    Returns:
+        dict: результат запроса, например:
+            {
+                "result": [
+                    {
+                      "product_id": 55946,
+                      "offer_id": "PG-2404С1",
+                      "updated": true,
+                      "errors": []
+                    }
+                ]
+            }
+
+    """
     url = "https://api-seller.ozon.ru/v1/product/import/stocks"
     headers = {
         "Client-Id": client_id,
@@ -96,6 +182,16 @@ def download_stock():
 
 
 def create_stocks(watch_remnants, offer_ids):
+    """Создает список содержащий информацию о наличии товаров на скалде
+
+    Args:
+        watch_remnants (list): нераспроданные товары (часы casio)
+        offer_ids (list): список уникальных идентификаторов товара
+
+    Returns:
+        list: список содержащий информацию количестве товаров на складе
+    """
+
     # Уберем то, что не загружено в seller
     stocks = []
     for watch in watch_remnants:
@@ -116,6 +212,15 @@ def create_stocks(watch_remnants, offer_ids):
 
 
 def create_prices(watch_remnants, offer_ids):
+    """Создает список цен на товары
+
+    Args:
+        watch_remnants (list): нераспроданные товары
+        offer_ids (list): список уникальных идентификаторов товара
+
+    Returns:
+        list: список, содержащий информацияю о ценах товаров
+    """
     prices = []
     for watch in watch_remnants:
         if str(watch.get("Код")) in offer_ids:
@@ -131,17 +236,48 @@ def create_prices(watch_remnants, offer_ids):
 
 
 def price_conversion(price: str) -> str:
-    """Преобразовать цену. Пример: 5'990.00 руб. -> 5990"""
+    """Преобразовать цену. Пример: 5'990.00 руб. -> 5990
+
+    Args:
+        price: Цена на товар в неотформатированном виде, например, 5'990.00 руб
+
+    Returns:
+        str: Цена за товар без символов разделителей
+            Например: 5'990.00 руб. -> 5990
+
+    """
+
     return re.sub("[^0-9]", "", price.split(".")[0])
 
 
 def divide(lst: list, n: int):
-    """Разделить список lst на части по n элементов"""
+    """Разделить список lst на части по n элементов
+
+    Args:
+        lst: список
+        n: количество элементов в возвращаемом списке
+
+    Yields:
+        list: список, разделенный на части по n элементов
+
+    """
     for i in range(0, len(lst), n):
         yield lst[i : i + n]
 
 
 async def upload_prices(watch_remnants, client_id, seller_token):
+    """Задает новые цены товаров на макетплейсе
+
+    Args:
+        watch_remnants (list): нераспроданные товары
+        client_id (int): идентификатор компании и магазина
+        seller_token (str): api token от маркетплейса
+
+    Returns:
+        list: список, содержащий информацияю о ценах товаров
+
+    """
+
     offer_ids = get_offer_ids(client_id, seller_token)
     prices = create_prices(watch_remnants, offer_ids)
     for some_price in list(divide(prices, 1000)):
@@ -150,6 +286,17 @@ async def upload_prices(watch_remnants, client_id, seller_token):
 
 
 async def upload_stocks(watch_remnants, client_id, seller_token):
+    """ Устанавливает количество товаров на складе
+
+    Args:
+        watch_remnants (list): нераспроданные товары
+        client_id (int): идентификатор компании и магазина
+        seller_token (str): api token от маркетплейса
+
+    Returns:
+        tuple: Возвращает список товаров в наличии
+
+    """
     offer_ids = get_offer_ids(client_id, seller_token)
     stocks = create_stocks(watch_remnants, offer_ids)
     for some_stock in list(divide(stocks, 100)):
@@ -159,6 +306,11 @@ async def upload_stocks(watch_remnants, client_id, seller_token):
 
 
 def main():
+    """
+    Получает информацию о нераспроданных товаров с сайта timeworld.ru
+    и артикулы товаров от маркетплейсов seller.ozon.ru, исключая отсутствующие товары.
+    Обновлет информацию о товаре и цены на маркетплейсе.
+    """
     env = Env()
     seller_token = env.str("SELLER_TOKEN")
     client_id = env.str("CLIENT_ID")
