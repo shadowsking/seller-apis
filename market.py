@@ -15,7 +15,7 @@ def get_product_list(page, campaign_id, access_token):
 
     Args:
         page (str): идетнификатор страницы с результатами
-        campaign_id (int): идентификатор компании и магазина
+        campaign_id (str): идентификатор компании и магазина
         access_token (str): api token от маркетплейса
 
     Returns:
@@ -48,7 +48,7 @@ def update_stocks(stocks, campaign_id, access_token):
 
     Args:
         stocks (list): список содержащий информацию количестве товаров на складе
-        campaign_id (int): идентификатор компании и магазина
+        campaign_id (str): идентификатор компании и магазина
         access_token (str): api token от маркетплейса
 
     Returns:
@@ -104,8 +104,8 @@ def update_price(prices, campaign_id, access_token):
         ]
 
     Args:
-        prices: список, содержащий информацияю о ценах товаров
-        campaign_id (int): идентификатор компании и магазина
+        prices (list): список, содержащий информацияю о ценах товаров
+        campaign_id (str): идентификатор компании и магазина
         access_token (str): api token от маркетплейса
 
     Returns:
@@ -134,7 +134,7 @@ def get_offer_ids(campaign_id, market_token):
     """Получить артикулы товаров Яндекс маркета
 
     Args:
-        campaign_id (int): идентификатор компании и магазина
+        campaign_id (str): идентификатор компании и магазина
         market_token (str): api token от маркетплейса
 
     Returns:
@@ -161,7 +161,7 @@ def create_stocks(watch_remnants, offer_ids, warehouse_id):
     Args:
         watch_remnants (list): нераспроданные товары (часы casio)
         offer_ids (list): список уникальных идентификаторов товара
-        warehouse_id (int): идентификатор склада
+        warehouse_id (str): идентификатор склада
 
     Returns:
         list: список содержащий информацию количестве товаров на складе
@@ -244,7 +244,7 @@ async def upload_prices(watch_remnants, campaign_id, market_token):
 
     Args:
         watch_remnants (list): нераспроданные товары
-        campaign_id (int): идентификатор компании и магазина
+        campaign_id (str): идентификатор компании и магазина
         market_token (str): api token от маркетплейса
 
     Returns:
@@ -263,9 +263,9 @@ async def upload_stocks(watch_remnants, campaign_id, market_token, warehouse_id)
 
     Args:
         watch_remnants (list): нераспроданные товары
-        campaign_id (int): идентификатор компании и магазина
+        campaign_id (str): идентификатор компании и магазина
         market_token (str): api token от маркетплейса
-        warehouse_id (int): идентификатор склада
+        warehouse_id (str): идентификатор склада
 
     Returns:
         tuple: Возвращает список товаров в наличии

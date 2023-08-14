@@ -16,7 +16,7 @@ def get_product_list(last_id, client_id, seller_token):
 
     Args:
         last_id (str): уникальный идетнификатор товара
-        client_id (int): идентификатор компании и магазина
+        client_id (str): идентификатор компании и магазина
         seller_token (str): api token от маркетплейса
 
     Returns:
@@ -48,7 +48,7 @@ def get_offer_ids(client_id, seller_token):
     Далее создается список уникальных идентификаторов.
 
     Args:
-        client_id (int): идентификатор компании и магазина
+        client_id (str): идентификатор компании и магазина
         seller_token (str): api token от маркетплейса
 
     Returns:
@@ -88,8 +88,8 @@ def update_price(prices: list, client_id, seller_token):
         ]
 
     Args:
-        prices: список, содержащий информацияю о ценах товаров
-        client_id (int): идентификатор компании и магазина
+        prices (list): список, содержащий информацияю о ценах товаров
+        client_id (str): идентификатор компании и магазина
         seller_token (str): api token от маркетплейса
 
     Returns:
@@ -131,8 +131,8 @@ def update_stocks(stocks: list, client_id, seller_token):
         ]
 
     Args:
-        stocks: список содержащий информацию количестве товаров на складе
-        client_id (int): идентификатор компании и магазина
+        stocks (list): список содержащий информацию количестве товаров на складе
+        client_id (str): идентификатор компании и магазина
         seller_token (str): api token от маркетплейса
 
     Returns:
@@ -270,7 +270,7 @@ async def upload_prices(watch_remnants, client_id, seller_token):
 
     Args:
         watch_remnants (list): нераспроданные товары
-        client_id (int): идентификатор компании и магазина
+        client_id (str): идентификатор компании и магазина
         seller_token (str): api token от маркетплейса
 
     Returns:
@@ -290,7 +290,7 @@ async def upload_stocks(watch_remnants, client_id, seller_token):
 
     Args:
         watch_remnants (list): нераспроданные товары
-        client_id (int): идентификатор компании и магазина
+        client_id (str): идентификатор компании и магазина
         seller_token (str): api token от маркетплейса
 
     Returns:
